@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Incident — Aegis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="report-body">
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <span class="logo-shield">AE</span>
+      <span class="logo-text">AEGIS</span>
+    </a>
+    <div class="nav-links">
+      <a href="/">← Back to Home</a>
+    </div>
+  </nav>
+
+  <!-- Report Form -->
+  <main class="report-main">
+    <div class="report-container">
+
+      <!-- Header -->
+      <div class="report-header">
+        <div class="report-icon-badge">🚨</div>
+        <h1 class="report-title">Report an Incident</h1>
+        <p class="report-subtitle">
+          Describe what you're seeing as clearly as possible.
+          Aegis will analyze and guide you in seconds.
+        </p>
+      </div>
+
+      <!-- Form Card -->
+      <div class="form-card">
+
+        <!-- Description Field -->
+        <div class="form-group">
+          <label class="form-label" for="description">
+            Describe the Incident
+            <span class="label-required">*</span>
+          </label>
+          <div class="textarea-wrapper">
+            <textarea
+              id="description"
+              class="form-textarea"
+              placeholder="Example: There is a fire in the second floor of the building. Smoke is coming out of the windows and people are still inside..."
+              rows="6"
+              maxlength="1000"
+            ></textarea>
+            <div class="char-counter"><span id="charCount">0</span> / 1000</div>
+          </div>
+          <div class="form-hint">
+            Tip: Include what you see, hear, and where people are located.
+          </div>
+        </div>
+
+        <!-- Location Dropdown -->
+        <div class="form-group">
+          <label class="form-label" for="location">
+            Incident Location
+            <span class="label-required">*</span>
+          </label>
+          <div class="select-wrapper">
+            <select id="location" class="form-select">
+              <option value="">— Select Location Type —</option>
+              <option value="School">School / University</option>
+              <option value="Highway">Highway / Road</option>
+              <option value="Residential">Residential Area</option>
+              <option value="Downtown">Downtown / Commercial</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <!-- Quick Tags (optional helpers) -->
+        <div class="form-group">
+          <label class="form-label">
+            Quick Tags
+            <span class="label-optional">(optional - tap to add to description)</span>
+          </label>
+          <div class="tags-container">
+            <button class="tag-btn" data-tag="fire smoke flames">Fire</button>
+            <button class="tag-btn" data-tag="car accident collision">Accident</button>
+            <button class="tag-btn" data-tag="person unconscious medical">Medical</button>
+            <button class="tag-btn" data-tag="robbery crime suspicious">Crime</button>
+            <button class="tag-btn" data-tag="flooding rising water">Flood</button>
+            <button class="tag-btn" data-tag="people trapped">Trapped</button>
+            <button class="tag-btn" data-tag="multiple injured">Injuries</button>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMsg" class="error-message" style="display:none;">
+          <span>!</span> <span id="errorText"></span>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="submitBtn" class="btn-submit" onclick="submitReport()">
+          <span class="submit-icon">?</span>
+          <span class="submit-text">Analyze Incident</span>
+          <span class="submit-arrow">→</span>
+        </button>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state" style="display:none;">
+          <div class="loading-spinner"></div>
+          <div class="loading-steps">
+            <div class="loading-step active" id="step1">Running ML Classification...</div>
+            <div class="loading-step" id="step2">Assessing Risk Level...</div>
+            <div class="loading-step" id="step3">Generating Recommendations...</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer-box">
+        <span class="disclaimer-icon">!</span>
+        <p>In life-threatening emergencies, <strong>call 911 immediately</strong>. This system provides guidance but does not replace official emergency services.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/report.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+id,keyword,location,text,target,incident_label
+38,collision,near the bridge,A collision happened near the bridge. Please respond immediately.,1,accident
+27,vehicle overturn,at the terminal entrance,Witnesses saw a vehicle overturn at the terminal entrance with injured passengers. The situation may get worse.,1,accident
+79,theft,at the market area,A possible theft case was reported at the market area. Several people are nearby.,1,crime
+92,waist-deep water,in the market street,People are stranded due to waist-deep water in the market street. This was just reported by residents.,1,flood
+50,chest pain,at the food court,There is a possible emergency with a chest pain at the food court. The situation may get worse.,1,medical
+16,flames,at the factory gate,"Emergency, visible flames at the factory gate. Several people are nearby.",1,fire
+94,waist-deep water,around the school grounds,Emergency teams are needed for waist-deep water around the school grounds. Please respond immediately.,1,flood
+72,theft,at the parking lot,A theft was reported at the parking lot. Please respond immediately.,1,crime
+87,overflowing creek,in the market street,Emergency teams are needed for overflowing creek in the market street. This was just reported by residents.,1,flood
+23,vehicle overturn,beside the mall,A delivery truck caused a vehicle overturn beside the mall. Several people are nearby.,1,accident
+14,explosion,near the market,A possible explosion incident was reported near the market. Please respond immediately.,1,fire
+41,unconscious patient,in the classroom,A patient with unconscious patient was seen in the classroom. This was just reported by residents.,1,medical
+53,seizure,inside the mall,There is a possible emergency with a seizure inside the mall. Several people are nearby.,1,medical
+13,burning,in the apartment,Something is burning in the apartment and there are strong burning.,1,fire
+89,rising water,in Barangay San Isidro,Families are affected by rising water in Barangay San Isidro.,1,flood
+46,person fainted,inside the mall,A person fainted was reported inside the mall. This was just reported by residents.,1,medical
+12,fire,at the factory gate,A possible fire incident was reported at the factory gate. Please respond immediately.,1,fire
+67,assault,at the market area,An emergency call mentioned assault at the market area.,1,crime
+21,motorcycle accident,along the national road,A delivery truck caused a motorcycle accident along the national road. Please respond immediately.,1,accident
+19,flames,in Barangay Poblacion,"Emergency, visible flames in Barangay Poblacion. Several people are nearby.",1,fire
+51,person fainted,inside the mall,A patient with person fainted was seen inside the mall. The situation may get worse.,1,medical
+3,explosion,near the market,Something is burning near the market and there are strong explosion. Please respond immediately.,1,fire
+18,fire,at the factory gate,Residents say fire is spreading quickly at the factory gate. This was just reported by residents.,1,fire
+86,waist-deep water,near the river,Emergency teams are needed for waist-deep water near the river.,1,flood
+6,flames,near the market,A possible flames incident was reported near the market.,1,fire
+98,rising water,in the subdivision,Residents reported rising water in the subdivision. Please respond immediately.,1,flood
+52,difficulty breathing,near the plaza,Security found a difficulty breathing near the plaza.,1,medical
+31,road accident,on the service road,There was a loud impact from a road accident on the service road. The situation may get worse.,1,accident
+75,suspicious armed person,near the terminal,There is an ongoing suspicious armed person near the terminal.,1,crime
+97,flash flood,around the school grounds,The road is blocked due to flash flood around the school grounds.,1,flood
+66,assault,outside the dormitory,A possible assault case was reported outside the dormitory. Please respond immediately.,1,crime
+55,seizure,in the library,There is a possible emergency with a seizure in the library. Please respond immediately.,1,medical
+28,collision,on the highway,An emergency report says collision on the highway. Several people are nearby.,1,accident
+59,unconscious patient,in the library,There is a possible emergency with a unconscious patient in the library. Please respond immediately.,1,medical
+34,vehicle overturn,near the bridge,There was a loud impact from a vehicle overturn near the bridge. Several people are nearby.,1,accident
+44,seizure,inside the mall,Immediate medical response is needed for a seizure inside the mall. The situation may get worse.,1,medical
+37,car crash,at the terminal entrance,Authorities are needed after a car crash at the terminal entrance. Please respond immediately.,1,accident
+22,motorcycle accident,on the service road,A motorcycle accident happened on the service road.,1,accident
+33,vehicle overturn,near the bridge,Two vehicles were involved in a vehicle overturn near the bridge. The situation may get worse.,1,accident
+71,assault,at the alley,People are calling police after a assault at the alley. Please respond immediately.,1,crime
+63,assault,near the campus gate,Witnesses saw a assault incident near the campus gate. This was just reported by residents.,1,crime
+100,rising water,at the underpass,Vehicles cannot pass because of rising water at the underpass. The situation may get worse.,1,flood
+74,suspicious armed person,outside the pharmacy,A possible suspicious armed person case was reported outside the pharmacy. Please respond immediately.,1,crime
+60,unconscious patient,near the basketball court,Immediate medical response is needed for a unconscious patient near the basketball court. The situation may get worse.,1,medical
+42,difficulty breathing,inside the dormitory,Bystanders say a difficulty breathing needs assistance inside the dormitory. The situation may get worse.,1,medical
+11,explosion,beside the gas station,Something is burning beside the gas station and there are strong explosion. Please respond immediately.,1,fire
+77,assault,outside the dormitory,Witnesses saw a assault incident outside the dormitory.,1,crime
+96,flash flood,along the main road,Strong rain led to flash flood along the main road.,1,flood
+29,road accident,beside the mall,Traffic stopped after a road accident beside the mall. The situation may get worse.,1,accident
+81,overflowing creek,around the school grounds,People are stranded due to overflowing creek around the school grounds. This was just reported by residents.,1,flood
+30,car crash,at the intersection,Witnesses saw a car crash at the intersection with injured passengers. Please respond immediately.,1,accident
+32,car crash,along the national road,An emergency report says car crash along the national road. The situation may get worse.,1,accident
+17,burning,inside the school canteen,A small burning started inside the school canteen and is getting bigger. Please respond immediately.,1,fire
+82,flash flood,in the market street,Vehicles cannot pass because of flash flood in the market street. This was just reported by residents.,1,flood
+2,fire,in the old building,People are evacuating because of fire in the old building. Several people are nearby.,1,fire
+85,rising water,along the main road,Vehicles cannot pass because of rising water along the main road. The situation may get worse.,1,flood
+78,stabbing,outside the dormitory,Someone needs help because of a stabbing outside the dormitory. This was just reported by residents.,1,crime
+88,flash flood,near the river,Emergency teams are needed for flash flood near the river.,1,flood
+4,fire,in the apartment,The room is filling with fire in the apartment. The situation may get worse.,1,fire
+36,road accident,along the national road,A serious road accident was reported along the national road. Please respond immediately.,1,accident
+91,flooding,near the river,The area is unsafe because of flooding near the river. Several people are nearby.,1,flood
+10,flames,at the warehouse,Something is burning at the warehouse and there are strong flames.,1,fire
+47,seizure,in the library,Someone is having seizure in the library. Several people are nearby.,1,medical
+5,fire,inside the school canteen,People are evacuating because of fire inside the school canteen. This was just reported by residents.,1,fire
+39,motorcycle accident,near the wet market,A delivery truck caused a motorcycle accident near the wet market. This was just reported by residents.,1,accident
+90,flooding,in the market street,The area is unsafe because of flooding in the market street. This was just reported by residents.,1,flood
+35,motorcycle accident,at the intersection,Two vehicles were involved in a motorcycle accident at the intersection.,1,accident
+65,robbery,outside the dormitory,People are calling police after a robbery outside the dormitory. Please respond immediately.,1,crime
+62,stabbing,near the ATM,A stabbing was reported near the ATM. Several people are nearby.,1,crime
+54,difficulty breathing,at the clinic entrance,"Please send responders, there is a difficulty breathing at the clinic entrance.",1,medical
+80,suspicious armed person,at the alley,There is an ongoing suspicious armed person at the alley.,1,crime
+25,motorcycle accident,near the overpass,Traffic stopped after a motorcycle accident near the overpass. Several people are nearby.,1,accident
+57,person fainted,in the office,"Please send responders, there is a person fainted in the office. Several people are nearby.",1,medical
+70,assault,in Barangay Centro,People are calling police after a assault in Barangay Centro. The situation may get worse.,1,crime
+64,stabbing,outside the pharmacy,A possible stabbing case was reported outside the pharmacy. Several people are nearby.,1,crime
+83,rising water,in the market street,Emergency teams are needed for rising water in the market street.,1,flood
+61,theft,outside the dormitory,Police assistance is needed after a theft outside the dormitory. The situation may get worse.,1,crime
+20,explosion,in the apartment,People are evacuating because of explosion in the apartment. This was just reported by residents.,1,fire
+7,smoke,at the factory gate,There is a smoke reported at the factory gate. This was just reported by residents.,1,fire
+56,unconscious patient,in the classroom,"Please send responders, there is a unconscious patient in the classroom. Several people are nearby.",1,medical
+76,robbery,behind the convenience store,Police assistance is needed after a robbery behind the convenience store. Please respond immediately.,1,crime
+1,burning,at the warehouse,The room is filling with burning at the warehouse.,1,fire
+45,seizure,inside the mall,There is a possible emergency with a seizure inside the mall. This was just reported by residents.,1,medical
+8,explosion,at the bus terminal,There is a explosion reported at the bus terminal. Please respond immediately.,1,fire
+49,unconscious patient,inside the dormitory,Students are asking help because of a unconscious patient inside the dormitory. Several people are nearby.,1,medical
+99,overflowing creek,near the river,Vehicles cannot pass because of overflowing creek near the river. Several people are nearby.,1,flood
+40,vehicle overturn,outside the campus gate,Two vehicles were involved in a vehicle overturn outside the campus gate. This was just reported by residents.,1,accident
+9,fire,in the old building,A small fire started in the old building and is getting bigger. Several people are nearby.,1,fire
+43,person fainted,near the plaza,Bystanders say a person fainted needs assistance near the plaza.,1,medical
+73,suspicious armed person,outside the pharmacy,There is an ongoing suspicious armed person outside the pharmacy. This was just reported by residents.,1,crime
+95,waist-deep water,at the underpass,Emergency teams are needed for waist-deep water at the underpass. Please respond immediately.,1,flood
+15,flames,in the old building,The room is filling with flames in the old building. Several people are nearby.,1,fire
+58,seizure,at the waiting shed,Immediate medical response is needed for a seizure at the waiting shed. This was just reported by residents.,1,medical
+93,rising water,at the underpass,The area is unsafe because of rising water at the underpass. This was just reported by residents.,1,flood
+24,collision,beside the mall,An emergency report says collision beside the mall. This was just reported by residents.,1,accident
+84,flash flood,along the main road,People are stranded due to flash flood along the main road.,1,flood
+68,assault,in Barangay Centro,People are calling police after a assault in Barangay Centro.,1,crime
+26,motorcycle accident,near the overpass,A motorcycle accident happened near the overpass. Several people are nearby.,1,accident
+69,assault,outside the dormitory,Security alert: assault outside the dormitory. Please respond immediately.,1,crime
+48,unconscious patient,in the classroom,Someone is having unconscious patient in the classroom. Please respond immediately.,1,medical
