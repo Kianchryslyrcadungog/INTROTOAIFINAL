@@ -1,0 +1,21 @@
+Accuracy: 0.95
+Precision: 0.96
+Recall: 0.95
+
+Classification Report:
+              precision    recall  f1-score   support
+
+    accident       1.00      1.00      1.00         4
+       crime       1.00      0.75      0.86         4
+        fire       0.80      1.00      0.89         4
+       flood       1.00      1.00      1.00         4
+     medical       1.00      1.00      1.00         4
+
+    accuracy                           0.95        20
+   macro avg       0.96      0.95      0.95        20
+weighted avg       0.96      0.95      0.95        20
+
+
+Model saved successfully!
+Saved model to: D:\3RD BSCS\INTRO TO AI\INTRO TO AI PROJECT\INTROTOAIFINAL\CAPSTONE-INTRO-TO-AI\aegis\incident_model.pkl
+Saved vectorizer to: D:\3RD BSCS\INTRO TO AI\INTRO TO AI PROJECT\INTROTOAIFINAL\CAPSTONE-INTRO-TO-AI\aegis\vectorizer.pkl
