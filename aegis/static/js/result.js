@@ -82,7 +82,6 @@ function renderResult(data) {
   const riskBadge = document.getElementById('riskBadge');
   const riskClass = data.risk_level.toLowerCase();
   riskBadge.classList.add('risk-' + riskClass);
-  document.getElementById('riskIcon').textContent = data.risk_icon;
   document.getElementById('riskValue').textContent = data.risk_level.toUpperCase();
 
   // --- Metadata ---

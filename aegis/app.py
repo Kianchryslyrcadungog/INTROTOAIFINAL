@@ -214,9 +214,9 @@ RULE_BASE = {
         ],
         "services": ["Fire Station", "Barangay Emergency Response", "Red Cross"],
         "contacts": [
-            {"name": "Bureau of Fire Protection", "number": "160"},
-            {"name": "Red Cross", "number": "143"},
-            {"name": "Emergency Hotline", "number": "911"},
+            {"name": "KABACAN BFP", "number": "0910-048-9571"},
+            {"name": "KABACAN PNP", "number": "0939-339-3168"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     },
     "Accident": {
@@ -231,9 +231,9 @@ RULE_BASE = {
         ],
         "services": ["Hospital", "Police Station", "Traffic Management"],
         "contacts": [
-            {"name": "Emergency Ambulance", "number": "911"},
-            {"name": "Philippine National Police", "number": "117"},
-            {"name": "Traffic Management Group", "number": "(02) 8523-0303"},
+            {"name": "KABACAN PNP", "number": "0939-339-3168"},
+            {"name": "KABACAN RHU", "number": "0926-397-0496"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     },
     "Medical": {
@@ -248,9 +248,9 @@ RULE_BASE = {
         ],
         "services": ["Clinic / Hospital", "Barangay Health Center", "Ambulance"],
         "contacts": [
-            {"name": "Emergency Ambulance", "number": "911"},
-            {"name": "DOH Emergency", "number": "1555"},
-            {"name": "Red Cross Ambulance", "number": "143"},
+            {"name": "Kabacan Polymedic Hospital", "number": "0645722063"},
+            {"name": "KABACAN RHU", "number": "0926-397-0496"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     },
     "Crime": {
@@ -265,9 +265,9 @@ RULE_BASE = {
         ],
         "services": ["Police Station", "Barangay Tanod", "CCTV Monitoring"],
         "contacts": [
-            {"name": "Philippine National Police", "number": "117"},
-            {"name": "PNP Hotline", "number": "8722-8888"},
-            {"name": "Emergency Hotline", "number": "911"},
+            {"name": "KABACAN PNP", "number": "0939-339-3168"},
+            {"name": "KABACAN INFO", "number": "0926-402-0423"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     },
     "Flood": {
@@ -282,9 +282,9 @@ RULE_BASE = {
         ],
         "services": ["Evacuation Center", "NDRRMC", "Coast Guard (if coastal)"],
         "contacts": [
-            {"name": "NDRRMC Operations Center", "number": "8911-1406"},
-            {"name": "PAGASA", "number": "1555"},
-            {"name": "Emergency Hotline", "number": "911"},
+            {"name": "KABACAN MDRRM", "number": "0909-382-9939"},
+            {"name": "KABACAN INFO", "number": "0926-402-0423"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     }
 }
@@ -295,35 +295,35 @@ RULE_BASE = {
 # ============================================================
 LOCATION_MAP = {
     "School": {
-        "additional_services": ["School Clinic", "School Security", "DepEd Emergency"],
+        "additional_services": ["School Clinic", "School Security", "Barangay Emergency"],
         "note": "Contact school administration and activate school emergency plan.",
         "contacts": [
-            {"name": "DepEd Emergency", "number": "(02) 8634-1072"},
-            {"name": "School Security", "number": "Local Extension"},
+            {"name": "KABACAN INFO", "number": "0926-402-0423"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     },
     "Highway": {
-        "additional_services": ["Highway Patrol", "MMDA / DPWH", "Towing Service"],
-        "note": "Highway incidents may involve multiple agencies. MMDA or LTO may assist.",
+        "additional_services": ["Barangay Emergency Response", "Traffic Management", "Towing Service"],
+        "note": "Highway incidents may involve multiple agencies. Local authorities may assist.",
         "contacts": [
-            {"name": "Highway Patrol Group", "number": "8706-3882"},
-            {"name": "MMDA Hotline", "number": "136"},
+            {"name": "KABACAN PNP", "number": "0939-339-3168"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     },
     "Residential": {
-        "additional_services": ["Barangay Hall", "Homeowners Association", "Barangay Tanod"],
+        "additional_services": ["Barangay Hall", "Homeowners Association", "Barangay Emergency"],
         "note": "Notify Barangay Captain immediately for community-level coordination.",
         "contacts": [
-            {"name": "Barangay Emergency", "number": "Local Barangay"},
-            {"name": "City Disaster Risk", "number": "Local DRRM"},
+            {"name": "KABACAN INFO", "number": "0926-402-0423"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     },
     "Downtown": {
-        "additional_services": ["City Police Precinct", "Mall Security", "City Health Office"],
+        "additional_services": ["City Police Precinct", "Commercial Security", "City Health Office"],
         "note": "Downtown areas have denser resources. CCTV coverage may assist investigation.",
         "contacts": [
-            {"name": "City Police", "number": "117"},
-            {"name": "City Health Emergency", "number": "Local City Hall"},
+            {"name": "KABACAN PNP", "number": "0939-339-3168"},
+            {"name": "USM SSMO", "number": "(064) 5722100"},
         ]
     }
 }
