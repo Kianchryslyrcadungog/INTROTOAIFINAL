@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysis Result — Aegis</title>
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('aegis-theme');
+        if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+      } catch (error) {
+        console.error('Theme load failed:', error);
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="result-body">
+
+  <div class="bg-grid"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <span class="logo-shield">AE</span>
+      <span class="logo-text">AEGIS</span>
+    </a>
+    <div class="nav-links">
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle color mode" aria-pressed="false">
+        <span class="theme-toggle-track" aria-hidden="true">
+          <span class="theme-toggle-thumb"></span>
+        </span>
+      </button>
+      <a href="/report" class="nav-cta">New Report</a>
+    </div>
+  </nav>
+
+  <!-- Result Content -->
+  <main class="result-main">
+
+    <!-- Hero Result Card -->
+    <div class="result-hero" id="resultHero">
+
+      <!-- Incident Type Banner -->
+      <div class="result-type-banner" id="typeBanner">
+        <div class="result-type-info">
+          <div class="result-type-label">Detected Incident</div>
+          <div class="result-type-name" id="typeName">Fire</div>
+        </div>
+        <div class="result-confidence" id="confidenceBadge">
+          <span class="confidence-label">AI Confidence</span>
+          <span class="confidence-value" id="confidenceValue">94.00%</span>
+        </div>
+      </div>
+
+      <!-- Risk Level Badge -->
+      <div class="result-risk-section">
+        <div class="risk-badge" id="riskBadge">
+          <span class="risk-icon" id="riskIcon">H</span>
+          <div class="risk-info">
+            <span class="risk-label">Risk Level</span>
+            <span class="risk-value" id="riskValue">HIGH</span>
+          </div>
+        </div>
+        <div class="result-meta">
+          <span class="meta-item">Location: <span id="metaLocation">Downtown</span></span>
+          <span class="meta-sep">|</span>
+          <span class="meta-item">Time: <span id="metaTime">Just now</span></span>
+        </div>
+      </div>
+
+      <!-- Description Preview -->
+      <div class="description-preview">
+        <span class="preview-label">Reported:</span>
+        <span class="preview-text" id="descPreview">"..."</span>
+      </div>
+    </div>
+
+    <!-- Analysis Grid -->
+    <div class="result-grid">
+
+      <!-- Recommended Actions -->
+      <div class="result-card card-actions">
+        <div class="card-header">
+          <span class="card-header-icon">ACT</span>
+          <h2 class="card-title">Immediate Actions</h2>
+          <span class="card-badge">Operational Guidance</span>
+        </div>
+        <ul class="actions-list" id="actionsList">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+
+      <!-- Right Column -->
+      <div class="result-right-col">
+
+        <!-- Suggested Services -->
+        <div class="result-card card-services">
+          <div class="card-header">
+            <span class="card-header-icon">SRV</span>
+            <h2 class="card-title">Suggested Services</h2>
+          </div>
+          <div class="services-list" id="servicesList">
+            <!-- Populated by JS -->
+          </div>
+          <!-- Location note -->
+          <div class="location-note" id="locationNote">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Emergency Contacts -->
+        <div class="result-card card-contacts">
+          <div class="card-header">
+            <span class="card-header-icon">CNT</span>
+            <h2 class="card-title">Emergency Contacts</h2>
+          </div>
+          <div class="contacts-list" id="contactsList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ML Confidence Breakdown -->
+    <div class="result-card card-ml">
+      <div class="card-header">
+        <span class="card-header-icon">ML</span>
+        <h2 class="card-title">ML Classification Breakdown</h2>
+        <span class="card-badge card-badge-blue">Naive Bayes</span>
+      </div>
+      <p class="ml-description">
+        The Naive Bayes classifier analyzed your text and scored it against all incident categories.
+        Higher scores indicate a stronger match.
+      </p>
+      <div class="ml-bars" id="mlBars">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="result-actions">
+      <a href="/report" class="btn-primary">
+        <span>NEW</span>
+        Report Another Incident
+      </a>
+      <button class="btn-secondary" onclick="window.print()">
+        <span>PDF</span>
+        Print This Report
+      </button>
+      <button class="btn-secondary" onclick="exportReport()">
+        <span>EXP</span>
+        Export Professional Report
+      </button>
+      <button class="btn-secondary" onclick="shareReport()">
+        <span>SHR</span>
+        Share
+      </button>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer-box">
+      <span class="disclaimer-icon">Notice</span>
+      <p>This analysis is AI-generated and for guidance only. <strong>Always contact official emergency services (911) in life-threatening situations.</strong> Do not rely solely on this system.</p>
+    </div>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/result.js') }}"></script>
+</body>
+</html>
