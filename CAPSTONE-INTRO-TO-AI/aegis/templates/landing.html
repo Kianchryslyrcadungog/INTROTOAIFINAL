@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aegis — Smart Emergency Guidance System</title>
+    <script>
+      (function () {
+        try {
+          var savedTheme = localStorage.getItem('aegis-theme');
+          var theme = savedTheme === 'light' || savedTheme === 'dark'
+            ? savedTheme
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.dataset.theme = theme;
+        } catch (error) {}
+      })();
+    </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
@@ -18,10 +29,16 @@
   <!-- Navigation -->
   <nav class="nav">
     <div class="nav-logo">
-      <span class="logo-shield">AE</span>
+      <span class="logo-shield"></span>
       <span class="logo-text">AEGIS</span>
     </div>
     <div class="nav-links">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb"></span>
+        </span>
+        <span class="theme-toggle-label" data-theme-label>Dark</span>
+      </button>
       <a href="#how-it-works">How It Works</a>
       <a href="/report" class="nav-cta">Report Now</a>
     </div>
@@ -46,7 +63,6 @@
 
     <div class="hero-actions">
       <a href="/report" class="btn-primary">
-        <span class="btn-icon">!</span>
         Report an Incident
         <span class="btn-arrow">→</span>
       </a>
@@ -84,27 +100,22 @@
     <h2 class="section-title">What Aegis Detects</h2>
     <div class="type-grid">
       <div class="type-card" data-type="fire">
-        <div class="type-icon">🔥</div>
         <div class="type-name">Fire</div>
         <div class="type-desc">Building fires, wildfires, electrical fires</div>
       </div>
       <div class="type-card" data-type="accident">
-        <div class="type-icon">🚗</div>
         <div class="type-name">Accident</div>
         <div class="type-desc">Road collisions, vehicle crashes</div>
       </div>
       <div class="type-card" data-type="medical">
-        <div class="type-icon">🏥</div>
         <div class="type-name">Medical</div>
         <div class="type-desc">Medical emergencies, cardiac events</div>
       </div>
       <div class="type-card" data-type="crime">
-        <div class="type-icon">🚔</div>
         <div class="type-name">Crime</div>
         <div class="type-desc">Robbery, assault, suspicious activity</div>
       </div>
       <div class="type-card" data-type="flood">
-        <div class="type-icon">🌊</div>
         <div class="type-name">Flood</div>
         <div class="type-desc">Flash floods, storm surges, typhoons</div>
       </div>
@@ -117,28 +128,24 @@
     <div class="steps-container">
       <div class="step">
         <div class="step-number">01</div>
-        <div class="step-icon">1</div>
         <h3 class="step-title">Describe the Incident</h3>
         <p class="step-desc">Type what you observe in plain language. No technical jargon needed.</p>
       </div>
       <div class="step-arrow">→</div>
       <div class="step">
         <div class="step-number">02</div>
-        <div class="step-icon">2</div>
         <h3 class="step-title">AI Classification</h3>
         <p class="step-desc">Naive Bayes ML model classifies incident type with confidence scoring.</p>
       </div>
       <div class="step-arrow">→</div>
       <div class="step">
         <div class="step-number">03</div>
-        <div class="step-icon">3</div>
         <h3 class="step-title">Risk Assessment</h3>
         <p class="step-desc">Forward chaining rules evaluate danger level: Low, Medium, or High.</p>
       </div>
       <div class="step-arrow">→</div>
       <div class="step">
         <div class="step-number">04</div>
-        <div class="step-icon">4</div>
         <h3 class="step-title">Get Guidance</h3>
         <p class="step-desc">Receive actionable steps, emergency contacts, and suggested services.</p>
       </div>
@@ -154,6 +161,7 @@
     <p class="footer-disclaimer">This system is for guidance only. Always contact official emergency services in life-threatening situations.</p>
   </footer>
 
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
   <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
 </body>
 </html>

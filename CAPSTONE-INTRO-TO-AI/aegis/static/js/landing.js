@@ -3,6 +3,10 @@
  * Handles animations and scroll effects
  */
 
+if (window.AegisTheme && typeof window.AegisTheme.init === 'function') {
+  window.AegisTheme.init();
+}
+
 // Animate type cards on scroll
 const typeCards = document.querySelectorAll('.type-card');
 const observer = new IntersectionObserver((entries) => {
