@@ -8,8 +8,10 @@ from io import BytesIO
 from pathlib import Path
 import json
 import re
+import shutil
 import sqlite3
 from uuid import uuid4
+from xml.sax.saxutils import escape
 
 import joblib
 from flask import Flask, render_template, request, jsonify, send_file, abort
@@ -18,7 +20,18 @@ app = Flask(__name__)
 
 MODEL_PATH = Path(__file__).with_name("incident_model.pkl")
 VECTORIZER_PATH = Path(__file__).with_name("vectorizer.pkl")
-DATABASE_PATH = Path(__file__).with_name("aegis.db")
+LEGACY_DATABASE_PATH = Path(__file__).with_name("aegis.db")
+DATABASE_PATH = Path(app.instance_path) / "aegis.db"
+
+
+def ensure_database_path():
+    Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+
+    if LEGACY_DATABASE_PATH.exists() and not DATABASE_PATH.exists():
+        try:
+            shutil.copy2(LEGACY_DATABASE_PATH, DATABASE_PATH)
+        except OSError:
+            pass
 
 
 def load_artifact(file_path):
@@ -36,6 +49,9 @@ else:
     print("Scikit-learn model loaded successfully.")
     print(f"   Model: {MODEL_PATH.name}")
     print(f"   Vectorizer: {VECTORIZER_PATH.name}")
+
+
+ensure_database_path()
 
 
 def init_database():
@@ -289,22 +305,25 @@ def build_pdf(report):
         ]))
         return table
 
+    def pdf_text(value):
+        return escape(str(value)).replace("\n", "<br/>")
+
     story = []
     story.append(Paragraph("AEGIS Incident Analysis Report", styles["ReportTitle"]))
     story.append(Paragraph("Professional export prepared for presentation, documentation, and operations review.", styles["BodySmall"]))
     story.append(Spacer(1, 8))
 
     summary_rows = [
-        [Paragraph("Incident Type", styles["MetaLabel"]), Paragraph(report["incident_type"], styles["MetaValue"]), Paragraph("Risk Level", styles["MetaLabel"]), Paragraph(report["risk_level"].upper(), styles["MetaValue"])],
-        [Paragraph("Confidence", styles["MetaLabel"]), Paragraph(f'{report["confidence"]:.1f}%', styles["MetaValue"]), Paragraph("Location", styles["MetaLabel"]), Paragraph(report["location"], styles["MetaValue"])],
-        [Paragraph("Generated", styles["MetaLabel"]), Paragraph(report["created_at"].replace("T", " ").replace("+00:00", " UTC"), styles["MetaValue"]), Paragraph("Report ID", styles["MetaLabel"]), Paragraph(report["report_id"], styles["MetaValue"])],
+        [Paragraph("Incident Type", styles["MetaLabel"]), Paragraph(pdf_text(report["incident_type"]), styles["MetaValue"]), Paragraph("Risk Level", styles["MetaLabel"]), Paragraph(pdf_text(report["risk_level"].upper()), styles["MetaValue"])],
+        [Paragraph("Confidence", styles["MetaLabel"]), Paragraph(pdf_text(f'{report["confidence"]:.1f}%'), styles["MetaValue"]), Paragraph("Location", styles["MetaLabel"]), Paragraph(pdf_text(report["location"]), styles["MetaValue"])],
+        [Paragraph("Generated", styles["MetaLabel"]), Paragraph(pdf_text(report["created_at"].replace("T", " ").replace("+00:00", " UTC")), styles["MetaValue"]), Paragraph("Report ID", styles["MetaLabel"]), Paragraph(pdf_text(report["report_id"]), styles["MetaValue"])],
     ]
     summary = box_table(summary_rows, [30 * mm, 55 * mm, 30 * mm, 55 * mm])
     story.append(summary)
     story.append(Spacer(1, 10))
 
     story.append(Paragraph("Reported Description", styles["SectionHeader"]))
-    story.append(Paragraph(report["description"], styles["BodySmall"]))
+    story.append(Paragraph(pdf_text(report["description"]), styles["BodySmall"]))
 
     story.append(Paragraph("Immediate Actions", styles["SectionHeader"]))
     action_rows = [[Paragraph("#", styles["MetaLabel"]), Paragraph("Recommended Action", styles["MetaLabel"])] ]
@@ -312,7 +331,7 @@ def build_pdf(report):
         cleaned_action = action
         for prefix in ["🚨 ", "📞 ", "🔴 ", "💨 ", "🚪 ", "🧯 ", "🏃 ", "🚑 ", "⚠️ ", "🩹 ", "📸 ", "🛑 ", "🏥 ", "🫀 ", "💊 ", "🩸 ", "🧘 ", "🌡️ ", "🔒 ", "📍 ", "👤 ", "🎥 "]:
             cleaned_action = cleaned_action.replace(prefix, "", 1)
-        action_rows.append([Paragraph(str(index), styles["BodySmall"]), Paragraph(cleaned_action, styles["BodySmall"])])
+        action_rows.append([Paragraph(pdf_text(index), styles["BodySmall"]), Paragraph(pdf_text(cleaned_action), styles["BodySmall"])])
     actions_table = box_table(action_rows, [12 * mm, 168 * mm])
     actions_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#dce7f4")),
@@ -323,14 +342,14 @@ def build_pdf(report):
 
     story.append(Paragraph("Service Coverage", styles["SectionHeader"]))
     services_text = ", ".join(report["services"])
-    story.append(Paragraph(services_text, styles["BodySmall"]))
+    story.append(Paragraph(pdf_text(services_text), styles["BodySmall"]))
 
     story.append(Paragraph("Emergency Contacts", styles["SectionHeader"]))
     contact_rows = [[Paragraph("Service", styles["MetaLabel"]), Paragraph("Number", styles["MetaLabel"])] ]
     for contact in report["contacts"]:
         contact_rows.append([
-            Paragraph(contact["name"], styles["BodySmall"]),
-            Paragraph(contact["number"], styles["BodySmall"]),
+            Paragraph(pdf_text(contact["name"]), styles["BodySmall"]),
+            Paragraph(pdf_text(contact["number"]), styles["BodySmall"]),
         ])
     story.append(box_table(contact_rows, [110 * mm, 70 * mm]))
 
@@ -340,11 +359,12 @@ def build_pdf(report):
     for item in report["all_scores"]:
         pct = (item["confidence"] / max_score) * 100
         bar_width = max(2, int(pct / 5))
+        score_label = pdf_text(item["type"])
         score_rows.append([
-            Paragraph(item["type"], styles["BodySmall"]),
-            Paragraph(f'{item["confidence"]:.1f}%', styles["PctRight"]),
+            Paragraph(score_label, styles["BodySmall"]),
+            Paragraph(pdf_text(f'{item["confidence"]:.1f}%'), styles["PctRight"]),
             Paragraph(
-                f'<font color="#5c6f8f">{item["type"]}</font><br/><font color="#1f4d82">{"█" * bar_width}</font>',
+                f'<font color="#5c6f8f">{score_label}</font><br/><font color="#1f4d82">{"█" * bar_width}</font>',
                 styles["BodySmall"],
             ),
         ])
@@ -401,20 +421,20 @@ KABACAN_CONTACTS = {
     "MDRRM": {"name": "KABACAN MDRRM", "number": "0909-382-9939"},
     "RHU": {"name": "KABACAN RHU", "number": "0926-397-0496"},
     "INFO": {"name": "KABACAN INFO", "number": "0926-402-0423"},
-    "HOSPITAL": {"name": "Kabacan Polymedic Hospital", "number": "0645722063"},
-    "SSMO": {"name": "USM Security Services and Management Office (SSMO)", "number": "(064) 5722100"},
+    "HOSPITAL": {"name": "Kabacan Polymedic Hospital", "number": "064 572 2063"},
+    "SSMO": {"name": "USM Security Services and Management Office (SSMO)", "number": "(064) 572 2100"},
 }
 
 RULE_BASE = {
     "Fire": {
         "actions": [
-            "🚨 Immediately evacuate all occupants from the building",
-            "📞 Call the Bureau of Fire Protection (BFP) at 160",
-            "🔴 Do NOT use elevators — use emergency stairwells",
-            "💨 Stay low to avoid smoke inhalation",
-            "🚪 Close doors behind you to slow fire spread",
-            "🧯 Use fire extinguisher ONLY if fire is small and contained",
-            "🏃 Move to the designated assembly point",
+            "Immediately evacuate all occupants from the building",
+            "Call the Bureau of Fire Protection (BFP) at 160",
+            "Do NOT use elevators — use emergency stairwells",
+            "Stay low to avoid smoke inhalation",
+            "Close doors behind you to slow fire spread",
+            "Use fire extinguisher ONLY if fire is small and contained",
+            "Move to the designated assembly point",
         ],
         "services": ["Fire Station", "Barangay Emergency Response", "Red Cross"],
         "contacts": [
@@ -425,13 +445,13 @@ RULE_BASE = {
     },
     "Accident": {
         "actions": [
-            "🚑 Call an ambulance immediately — do NOT move injured persons",
-            "⚠️ Set up warning signs / hazard lights to prevent secondary accidents",
-            "🩹 Apply first aid if you are trained to do so",
-            "📞 Report to the nearest police station",
-            "🚧 Clear the area of bystanders",
-            "📸 Document the scene for insurance/legal purposes",
-            "🛑 Do NOT leave the scene until authorities arrive",
+            "Call an ambulance immediately — do NOT move injured persons",
+            "Set up warning signs / hazard lights to prevent secondary accidents",
+            "Apply first aid if you are trained to do so",
+            "Report to the nearest police station",
+            "Clear the area of bystanders",
+            "Document the scene for insurance/legal purposes",
+            "Do NOT leave the scene until authorities arrive",
         ],
         "services": ["Hospital", "Police Station", "Traffic Management"],
         "contacts": [
@@ -442,13 +462,13 @@ RULE_BASE = {
     },
     "Medical": {
         "actions": [
-            "🏥 Transport patient to the nearest hospital immediately",
-            "🫀 Perform CPR if the person is unresponsive and not breathing",
-            "💊 Do NOT give food, water, or medication without doctor's advice",
-            "🩸 Apply pressure to stop any bleeding",
-            "📞 Call emergency services and describe symptoms clearly",
-            "🧘 Keep the patient calm and still",
-            "🌡️ Monitor vital signs until help arrives",
+            "Transport patient to the nearest hospital immediately",
+            "Perform CPR if the person is unresponsive and not breathing",
+            "Do NOT give food, water, or medication without doctor's advice",
+            "Apply pressure to stop any bleeding",
+            "Call emergency services and describe symptoms clearly",
+            "Keep the patient calm and still",
+            "Monitor vital signs until help arrives",
         ],
         "services": ["Clinic / Hospital", "Barangay Health Center", "Ambulance"],
         "contacts": [
@@ -459,13 +479,13 @@ RULE_BASE = {
     },
     "Crime": {
         "actions": [
-            "🚔 Call the police immediately — do NOT confront suspects",
-            "📍 Stay at a safe distance and observe from a safe location",
-            "📝 Note suspect descriptions: clothing, height, direction of escape",
-            "🎥 Do NOT tamper with evidence at the scene",
-            "👤 Gather witness contact information if safe to do so",
-            "🔒 Secure yourself in a safe location",
-            "📞 Report to Barangay Tanod if police are unavailable",
+            "Call the police immediately — do NOT confront suspects",
+            "Stay at a safe distance and observe from a safe location",
+            "Note suspect descriptions: clothing, height, direction of escape",
+            "Do NOT tamper with evidence at the scene",
+            "Gather witness contact information if safe to do so",
+            "Secure yourself in a safe location",
+            "Report to Barangay Tanod if police are unavailable",
         ],
         "services": ["Police Station", "Barangay Tanod", "CCTV Monitoring"],
         "contacts": [
@@ -476,13 +496,13 @@ RULE_BASE = {
     },
     "Flood": {
         "actions": [
-            "🏃 Evacuate immediately to higher ground — do NOT wait",
-            "🎒 Bring emergency kit: food, water, documents, medicines",
-            "⚡ Turn off electricity at main breaker before leaving",
-            "🚗 Do NOT drive through floodwaters — turn around",
-            "📻 Monitor PAGASA bulletins and local government advisories",
-            "📞 Report to NDRRMC or local DRRM office",
-            "🏫 Proceed to designated evacuation centers",
+            "Evacuate immediately to higher ground — do NOT wait",
+            "Bring emergency kit: food, water, documents, medicines",
+            "Turn off electricity at main breaker before leaving",
+            "Do NOT drive through floodwaters — turn around",
+            "Monitor PAGASA bulletins and local government advisories",
+            "Report to NDRRMC or local DRRM office",
+            "Proceed to designated evacuation centers",
         ],
         "services": ["Evacuation Center", "NDRRMC", "Coast Guard (if coastal)"],
         "contacts": [
