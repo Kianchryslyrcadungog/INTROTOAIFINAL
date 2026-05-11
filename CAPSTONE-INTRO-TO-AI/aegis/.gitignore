@@ -1,0 +1,5 @@
+instance/
+aegis.db
+*.db-journal
+*.db-wal
+*.db-shm

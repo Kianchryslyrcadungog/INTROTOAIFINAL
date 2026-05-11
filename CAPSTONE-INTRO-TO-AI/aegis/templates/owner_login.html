@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Login — Aegis</title>
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('aegis-theme');
+        var theme = savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.dataset.theme = theme;
+      } catch (error) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="owner-auth-body">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <main class="owner-auth-shell">
+    <section class="owner-auth-card">
+      <div class="owner-auth-badge">Owner Access</div>
+      <h1 class="owner-auth-title">Analytics Dashboard Login</h1>
+      <p class="owner-auth-copy">Enter the owner access code to view usage data, trends, and chart visualizations.</p>
+
+      {% if error_message %}
+      <div class="owner-auth-error">{{ error_message }}</div>
+      {% endif %}
+
+      <form method="post" class="owner-auth-form">
+        <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+        <label class="owner-auth-label" for="access_code">Owner Code</label>
+        <input id="access_code" name="access_code" type="password" class="owner-auth-input" placeholder="Enter owner code" required>
+        <button type="submit" class="owner-auth-submit">Open Dashboard</button>
+      </form>
+
+      <a href="/" class="owner-auth-back">Back to Home</a>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

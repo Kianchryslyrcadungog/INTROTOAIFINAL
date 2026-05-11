@@ -46,3 +46,26 @@ steps.forEach(step => {
   step.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
   stepObserver.observe(step);
 });
+
+// Secret owner login shortcut: Ctrl + Alt + O
+const ownerSecretLink = document.querySelector('[data-owner-secret-link]');
+let ownerShortcutUnlocked = false;
+
+function unlockOwnerAccess() {
+  if (!ownerSecretLink || ownerShortcutUnlocked) {
+    return;
+  }
+
+  ownerShortcutUnlocked = true;
+  ownerSecretLink.hidden = false;
+  ownerSecretLink.classList.add('owner-secret-revealed');
+}
+
+document.addEventListener('keydown', (event) => {
+  const shortcutPressed = event.ctrlKey && event.altKey && event.key.toLowerCase() === 'o';
+
+  if (shortcutPressed) {
+    event.preventDefault();
+    unlockOwnerAccess();
+  }
+});
