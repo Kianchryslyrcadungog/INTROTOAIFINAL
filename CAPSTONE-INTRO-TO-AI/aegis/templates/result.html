@@ -36,6 +36,12 @@
         </span>
         <span class="theme-toggle-label" data-theme-label>Dark</span>
       </button>
+      {% if session.get('owner_authenticated') %}
+      <a href="{{ url_for('dashboard') }}" class="nav-cta">Dashboard</a>
+      <form action="{{ url_for('owner_logout') }}" method="post" class="nav-owner-form">
+        <button type="submit" class="nav-owner-link">Logout</button>
+      </form>
+      {% endif %}
       <a href="/report" class="nav-cta">New Report</a>
     </div>
   </nav>

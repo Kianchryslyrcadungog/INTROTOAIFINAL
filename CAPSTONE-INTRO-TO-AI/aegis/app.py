@@ -5,23 +5,27 @@ Flask Backend with scikit-learn Naive Bayes + Rule-Based Reasoning
 
 from datetime import datetime, timezone
 from io import BytesIO
+import os
 from pathlib import Path
 import json
 import re
 import shutil
 import sqlite3
+from functools import wraps
 from uuid import uuid4
 from xml.sax.saxutils import escape
 
 import joblib
-from flask import Flask, render_template, request, jsonify, send_file, abort
+from flask import Flask, abort, jsonify, redirect, render_template, request, send_file, session, url_for
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "aegis-dev-secret-key")
 
 MODEL_PATH = Path(__file__).with_name("incident_model.pkl")
 VECTORIZER_PATH = Path(__file__).with_name("vectorizer.pkl")
 LEGACY_DATABASE_PATH = Path(__file__).with_name("aegis.db")
 DATABASE_PATH = Path(app.instance_path) / "aegis.db"
+OWNER_ACCESS_CODE = os.environ.get("AEGIS_OWNER_CODE", "aegis-owner-2026")
 
 
 def ensure_database_path():
@@ -200,6 +204,210 @@ def load_report_snapshot(report_id):
         "description_preview": row["description_preview"],
         "created_at": row["created_at"],
     }
+
+
+def owner_required(view_function):
+    @wraps(view_function)
+    def wrapper(*args, **kwargs):
+        if not session.get("owner_authenticated"):
+            return redirect(url_for("owner_login", next=request.path))
+        return view_function(*args, **kwargs)
+
+    return wrapper
+
+
+def fetch_dashboard_data():
+    with sqlite3.connect(DATABASE_PATH) as connection:
+        connection.row_factory = sqlite3.Row
+
+        total_reports = connection.execute("SELECT COUNT(*) AS count FROM analysis_reports").fetchone()["count"]
+        total_exports = connection.execute("SELECT COUNT(*) AS count FROM report_exports").fetchone()["count"]
+
+        incident_rows = connection.execute(
+            """
+            SELECT incident_type, COUNT(*) AS count
+            FROM analysis_reports
+            GROUP BY incident_type
+            ORDER BY count DESC, incident_type ASC
+            """
+        ).fetchall()
+
+        location_rows = connection.execute(
+            """
+            SELECT location, COUNT(*) AS count
+            FROM analysis_reports
+            GROUP BY location
+            ORDER BY count DESC, location ASC
+            """
+        ).fetchall()
+
+        risk_rows = connection.execute(
+            """
+            SELECT risk_level, COUNT(*) AS count
+            FROM analysis_reports
+            GROUP BY risk_level
+            ORDER BY count DESC, risk_level ASC
+            """
+        ).fetchall()
+
+        trend_rows = connection.execute(
+            """
+            SELECT date(created_at) AS day, COUNT(*) AS count
+            FROM analysis_reports
+            GROUP BY date(created_at)
+            ORDER BY day ASC
+            """
+        ).fetchall()
+
+        recent_reports = connection.execute(
+            """
+            SELECT description, location, incident_type, confidence, risk_level, created_at
+            FROM analysis_reports
+            ORDER BY created_at DESC
+            LIMIT 10
+            """
+        ).fetchall()
+
+        all_reports = connection.execute(
+            """
+            SELECT description, location, incident_type, confidence, risk_level, created_at
+            FROM analysis_reports
+            ORDER BY created_at DESC
+            """
+        ).fetchall()
+
+    return {
+        "summary": {
+            "total_reports": total_reports,
+            "total_exports": total_exports,
+            "unique_incidents": len(incident_rows),
+            "unique_locations": len(location_rows),
+        },
+        "incident_labels": [row["incident_type"] for row in incident_rows],
+        "incident_values": [row["count"] for row in incident_rows],
+        "location_labels": [row["location"] for row in location_rows],
+        "location_values": [row["count"] for row in location_rows],
+        "risk_labels": [row["risk_level"] for row in risk_rows],
+        "risk_values": [row["count"] for row in risk_rows],
+        "trend_labels": [row["day"] for row in trend_rows],
+        "trend_values": [row["count"] for row in trend_rows],
+        "recent_reports": [dict(row) for row in recent_reports],
+        "all_reports": [dict(row) for row in all_reports],
+    }
+
+
+def build_dashboard_pdf(dashboard_data):
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_LEFT, TA_RIGHT
+    from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+
+    def pdf_text(value):
+        return escape(str(value)).replace("\n", "<br/>")
+
+    def table_block(rows, widths):
+        table = Table(rows, colWidths=widths, hAlign="LEFT")
+        table.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#dce7f4")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.HexColor("#10233f")),
+            ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#cfd9e6")),
+            ("INNERGRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#dde5ef")),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+            ("TOPPADDING", (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ]))
+        return table
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        leftMargin=12 * mm,
+        rightMargin=12 * mm,
+        topMargin=12 * mm,
+        bottomMargin=12 * mm,
+        title="AEGIS Owner Dashboard Export",
+        author="AEGIS",
+    )
+
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(
+        name="DashTitle",
+        parent=styles["Title"],
+        fontName="Helvetica-Bold",
+        fontSize=20,
+        leading=24,
+        textColor=colors.HexColor("#10233f"),
+        alignment=TA_LEFT,
+        spaceAfter=6,
+    ))
+    styles.add(ParagraphStyle(
+        name="DashBody",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor("#24364f"),
+    ))
+    styles.add(ParagraphStyle(
+        name="DashRight",
+        parent=styles["BodyText"],
+        fontName="Helvetica-Bold",
+        fontSize=9,
+        leading=11,
+        alignment=TA_RIGHT,
+        textColor=colors.HexColor("#173153"),
+    ))
+
+    story = []
+    story.append(Paragraph("AEGIS Owner Dashboard Export", styles["DashTitle"]))
+    story.append(Paragraph("Complete summary of system usage generated from stored incident analysis records.", styles["DashBody"]))
+    story.append(Spacer(1, 8))
+
+    summary = dashboard_data["summary"]
+    summary_rows = [
+        [Paragraph("Total Reports", styles["DashBody"]), Paragraph(pdf_text(summary["total_reports"]), styles["DashRight"]), Paragraph("PDF Exports", styles["DashBody"]), Paragraph(pdf_text(summary["total_exports"]), styles["DashRight"])],
+        [Paragraph("Incident Types", styles["DashBody"]), Paragraph(pdf_text(summary["unique_incidents"]), styles["DashRight"]), Paragraph("Locations", styles["DashBody"]), Paragraph(pdf_text(summary["unique_locations"]), styles["DashRight"])],
+    ]
+    story.append(table_block(summary_rows, [34 * mm, 56 * mm, 34 * mm, 56 * mm]))
+    story.append(Spacer(1, 8))
+
+    incident_rows = [[Paragraph("Incident Type", styles["DashBody"]), Paragraph("Count", styles["DashBody"])] ]
+    for label, value in zip(dashboard_data["incident_labels"], dashboard_data["incident_values"]):
+        incident_rows.append([Paragraph(pdf_text(label), styles["DashBody"]), Paragraph(pdf_text(value), styles["DashRight"])])
+    story.append(Paragraph("Incident Type Breakdown", styles["DashBody"]))
+    story.append(table_block(incident_rows, [100 * mm, 100 * mm]))
+    story.append(Spacer(1, 8))
+
+    recent_rows = [[Paragraph("Date", styles["DashBody"]), Paragraph("Incident", styles["DashBody"]), Paragraph("Location", styles["DashBody"]), Paragraph("Confidence", styles["DashBody"]), Paragraph("Risk", styles["DashBody"])] ]
+    for row in dashboard_data["all_reports"][:30]:
+        recent_rows.append([
+            Paragraph(pdf_text(row["created_at"]), styles["DashBody"]),
+            Paragraph(pdf_text(row["incident_type"]), styles["DashBody"]),
+            Paragraph(pdf_text(row["location"]), styles["DashBody"]),
+            Paragraph(pdf_text(f'{row["confidence"]:.1f}%'), styles["DashRight"]),
+            Paragraph(pdf_text(row["risk_level"]), styles["DashBody"]),
+        ])
+    story.append(Paragraph("All Stored Results (Latest 30)", styles["DashBody"]))
+    story.append(table_block(recent_rows, [42 * mm, 40 * mm, 48 * mm, 28 * mm, 30 * mm]))
+
+    def add_page_number(canvas, doc_obj):
+        canvas.saveState()
+        canvas.setStrokeColor(colors.HexColor("#d6dfeb"))
+        canvas.line(doc_obj.leftMargin, 12 * mm, doc.width + doc_obj.leftMargin, 12 * mm)
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.HexColor("#667a96"))
+        canvas.drawString(doc_obj.leftMargin, 7.5 * mm, "AEGIS Owner Dashboard")
+        canvas.drawRightString(doc_obj.pagesize[0] - doc_obj.rightMargin, 7.5 * mm, f"Page {doc_obj.page}")
+        canvas.restoreState()
+
+    doc.build(story, onFirstPage=add_page_number, onLaterPages=add_page_number)
+    buffer.seek(0)
+    return buffer
 
 
 def build_pdf(report):
@@ -608,6 +816,55 @@ def determine_risk_level(incident_type, description, location):
 def landing():
     """Landing page"""
     return render_template('landing.html')
+
+
+@app.route('/owner/login', methods=['GET', 'POST'])
+def owner_login():
+    """Simple owner gate for analytics access."""
+    error_message = None
+
+    if request.method == 'GET' and session.get('owner_authenticated'):
+        return redirect(request.args.get('next') or url_for('dashboard'))
+
+    if request.method == 'POST':
+        access_code = request.form.get('access_code', '').strip()
+        if access_code == OWNER_ACCESS_CODE:
+            session['owner_authenticated'] = True
+            next_url = request.form.get('next') or request.args.get('next') or url_for('dashboard')
+            return redirect(next_url)
+
+        error_message = 'Invalid owner code.'
+
+    return render_template('owner_login.html', error_message=error_message)
+
+
+@app.post('/owner/logout')
+def owner_logout():
+    """Clear owner session."""
+    session.pop('owner_authenticated', None)
+    return redirect(url_for('landing'))
+
+
+@app.route('/dashboard')
+@owner_required
+def dashboard():
+    """Owner analytics dashboard with charts and usage summaries."""
+    dashboard_data = fetch_dashboard_data()
+    return render_template('dashboard.html', **dashboard_data)
+
+
+@app.route('/dashboard/export-pdf')
+@owner_required
+def export_dashboard_pdf():
+    """Export a PDF summary of all stored system results."""
+    dashboard_data = fetch_dashboard_data()
+    pdf_buffer = build_dashboard_pdf(dashboard_data)
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='aegis-dashboard-export.pdf',
+    )
 
 @app.route('/report')
 def report():

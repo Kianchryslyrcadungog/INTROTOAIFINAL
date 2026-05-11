@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Dashboard — Aegis</title>
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('aegis-theme');
+        var theme = savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.dataset.theme = theme;
+      } catch (error) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-body">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <span class="logo-shield">AE</span>
+      <span class="logo-text">AEGIS</span>
+    </a>
+    <div class="nav-links">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb"></span>
+        </span>
+        <span class="theme-toggle-label" data-theme-label>Dark</span>
+      </button>
+      <a href="/report">New Report</a>
+      <a href="{{ url_for('export_dashboard_pdf') }}" class="nav-cta">Export PDF</a>
+      <form action="{{ url_for('owner_logout') }}" method="post" class="nav-owner-form">
+        <button type="submit" class="nav-owner-link">Logout</button>
+      </form>
+    </div>
+  </nav>
+
+  <main class="dashboard-main">
+    <section class="dashboard-hero">
+      <div class="dashboard-hero-row">
+        <div>
+          <div class="dashboard-kicker">Owner Analytics</div>
+          <h1 class="dashboard-title">System Usage Dashboard</h1>
+          <p class="dashboard-subtitle">Live summary of incident reports generated through Aegis.</p>
+        </div>
+        <a href="{{ url_for('export_dashboard_pdf') }}" class="btn-primary dashboard-export-btn">Download All Results PDF</a>
+      </div>
+      <div class="dashboard-stats-grid">
+        <div class="dashboard-stat-card">
+          <span class="dashboard-stat-label">Total Reports</span>
+          <strong class="dashboard-stat-value">{{ summary.total_reports }}</strong>
+        </div>
+        <div class="dashboard-stat-card">
+          <span class="dashboard-stat-label">PDF Exports</span>
+          <strong class="dashboard-stat-value">{{ summary.total_exports }}</strong>
+        </div>
+        <div class="dashboard-stat-card">
+          <span class="dashboard-stat-label">Incident Types</span>
+          <strong class="dashboard-stat-value">{{ summary.unique_incidents }}</strong>
+        </div>
+        <div class="dashboard-stat-card">
+          <span class="dashboard-stat-label">Locations</span>
+          <strong class="dashboard-stat-value">{{ summary.unique_locations }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="dashboard-card chart-card">
+        <div class="card-header">
+          <h2 class="card-title">Incident Type Breakdown</h2>
+        </div>
+        <canvas id="incidentChart" height="260"></canvas>
+      </article>
+
+      <article class="dashboard-card chart-card">
+        <div class="card-header">
+          <h2 class="card-title">Risk Level Breakdown</h2>
+        </div>
+        <canvas id="riskChart" height="260"></canvas>
+      </article>
+
+      <article class="dashboard-card chart-card">
+        <div class="card-header">
+          <h2 class="card-title">Location Breakdown</h2>
+        </div>
+        <canvas id="locationChart" height="260"></canvas>
+      </article>
+
+      <article class="dashboard-card chart-card">
+        <div class="card-header">
+          <h2 class="card-title">Reports Over Time</h2>
+        </div>
+        <canvas id="trendChart" height="260"></canvas>
+      </article>
+    </section>
+
+    <section class="dashboard-card table-card">
+      <div class="card-header">
+        <h2 class="card-title">Recent Reports</h2>
+        <span class="card-badge">Latest 10</span>
+      </div>
+      <div class="table-wrap">
+        <table class="dashboard-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Incident</th>
+              <th>Location</th>
+              <th>Confidence</th>
+              <th>Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in recent_reports %}
+            <tr>
+              <td>{{ row.created_at }}</td>
+              <td>{{ row.incident_type }}</td>
+              <td>{{ row.location }}</td>
+              <td>{{ '%.1f%%'|format(row.confidence) }}</td>
+              <td>{{ row.risk_level }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5" class="table-empty">No reports yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <script>
+    const incidentLabels = {{ incident_labels|tojson }};
+    const incidentValues = {{ incident_values|tojson }};
+    const locationLabels = {{ location_labels|tojson }};
+    const locationValues = {{ location_values|tojson }};
+    const riskLabels = {{ risk_labels|tojson }};
+    const riskValues = {{ risk_values|tojson }};
+    const trendLabels = {{ trend_labels|tojson }};
+    const trendValues = {{ trend_values|tojson }};
+
+    const isLightTheme = document.documentElement.dataset.theme === 'light';
+    const mutedColor = isLightTheme ? '#526780' : '#9cb0cb';
+    const gridColor = isLightTheme ? 'rgba(17,34,58,0.10)' : 'rgba(255,255,255,0.08)';
+
+    function buildDoughnut(canvasId, labels, values, colors) {
+      const safeLabels = labels.length ? labels : ['No data'];
+      const safeValues = values.length ? values : [1];
+      new Chart(document.getElementById(canvasId), {
+        type: 'doughnut',
+        data: {
+          labels: safeLabels,
+          datasets: [{
+            data: safeValues,
+            backgroundColor: colors,
+            borderColor: gridColor,
+            borderWidth: 2,
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { labels: { color: mutedColor } }
+          }
+        }
+      });
+    }
+
+    buildDoughnut('incidentChart', incidentLabels, incidentValues, ['#5b8cff', '#5fd6e4', '#f6b84f', '#56d08b', '#ff6b6b']);
+    buildDoughnut('locationChart', locationLabels, locationValues, ['#355ef6', '#149ab0', '#8b5cf6', '#f59e0b']);
+    buildDoughnut('riskChart', riskLabels, riskValues, ['#ef4444', '#f59e0b', '#22c55e']);
+
+    new Chart(document.getElementById('trendChart'), {
+      type: 'line',
+      data: {
+        labels: trendLabels.length ? trendLabels : ['No data'],
+        datasets: [{
+          label: 'Reports',
+          data: trendValues.length ? trendValues : [0],
+          tension: 0.35,
+          fill: true,
+          borderColor: '#5b8cff',
+          backgroundColor: 'rgba(91,140,255,0.12)',
+          pointBackgroundColor: '#5fd6e4',
+          pointBorderColor: '#5fd6e4'
+        }]
+      },
+      options: {
+        scales: {
+          x: { ticks: { color: mutedColor }, grid: { color: gridColor } },
+          y: { ticks: { color: mutedColor, precision: 0 }, grid: { color: gridColor } }
+        },
+        plugins: {
+          legend: { labels: { color: mutedColor } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

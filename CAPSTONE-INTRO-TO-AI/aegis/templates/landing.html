@@ -40,6 +40,13 @@
         <span class="theme-toggle-label" data-theme-label>Dark</span>
       </button>
       <a href="#how-it-works">How It Works</a>
+      <a href="{{ url_for('owner_login') }}" class="nav-owner-secret" data-owner-secret-link hidden>Owner Login</a>
+      {% if session.get('owner_authenticated') %}
+      <a href="{{ url_for('dashboard') }}" class="nav-cta">Dashboard</a>
+      <form action="{{ url_for('owner_logout') }}" method="post" class="nav-owner-form">
+        <button type="submit" class="nav-owner-link">Logout</button>
+      </form>
+      {% endif %}
       <a href="/report" class="nav-cta">Report Now</a>
     </div>
   </nav>
