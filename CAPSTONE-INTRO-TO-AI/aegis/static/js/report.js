@@ -3,6 +3,10 @@
  * Handles form validation, tag insertion, API call, and loading states
  */
 
+if (window.AegisTheme && typeof window.AegisTheme.init === 'function') {
+  window.AegisTheme.init();
+}
+
 const descInput = document.getElementById('description');
 const charCount = document.getElementById('charCount');
 const submitBtn = document.getElementById('submitBtn');
@@ -109,14 +113,14 @@ async function submitReport() {
     });
 
     if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error || 'Analysis failed');
+      throw new Error(await parseErrorResponse(response));
     }
 
     const data = await response.json();
 
     // Store result in sessionStorage for the result page
     sessionStorage.setItem('aegisResult', JSON.stringify(data));
+    sessionStorage.setItem('aegisReportId', data.report_id);
 
     // Small delay to let loading animation finish
     await sleep(2600);
@@ -139,6 +143,27 @@ function showError(message) {
 
 function hideError() {
   errorMsg.style.display = 'none';
+}
+
+async function parseErrorResponse(response) {
+  const contentType = response.headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    try {
+      const payload = await response.json();
+      return payload.error || payload.message || `Request failed with status ${response.status}`;
+    } catch (error) {
+      return `Request failed with status ${response.status}`;
+    }
+  }
+
+  try {
+    const text = await response.text();
+    const stripped = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    return stripped || `Request failed with status ${response.status}`;
+  } catch (error) {
+    return `Request failed with status ${response.status}`;
+  }
 }
 
 // --- Helper: toggle loading state ---
