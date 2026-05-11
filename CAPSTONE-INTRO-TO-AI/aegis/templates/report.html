@@ -4,6 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Report Incident — Aegis</title>
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('aegis-theme');
+        if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+      } catch (error) {
+        console.error('Theme load failed:', error);
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
@@ -16,11 +28,15 @@
   <!-- Navigation -->
   <nav class="nav">
     <a href="/" class="nav-logo">
-      <span class="logo-shield">AE</span>
       <span class="logo-text">AEGIS</span>
     </a>
     <div class="nav-links">
-      <a href="/">← Back to Home</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle color mode" aria-pressed="false">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb"></span>
+        </span>
+      </button>
+      <a href="/">Back to Home</a>
     </div>
   </nav>
 
@@ -30,7 +46,6 @@
 
       <!-- Header -->
       <div class="report-header">
-        <div class="report-icon-badge">🚨</div>
         <h1 class="report-title">Report an Incident</h1>
         <p class="report-subtitle">
           Describe what you're seeing as clearly as possible.
@@ -76,7 +91,6 @@
               <option value="Residential">Residential Area</option>
               <option value="Downtown">Downtown / Commercial</option>
             </select>
-            <span class="select-arrow">▼</span>
           </div>
         </div>
 
@@ -99,14 +113,14 @@
 
         <!-- Error Message -->
         <div id="errorMsg" class="error-message" style="display:none;">
-          <span>!</span> <span id="errorText"></span>
+          <span>Alert</span> <span id="errorText"></span>
         </div>
 
         <!-- Submit Button -->
         <button id="submitBtn" class="btn-submit" onclick="submitReport()">
-          <span class="submit-icon">?</span>
+          <span class="submit-icon">AI</span>
           <span class="submit-text">Analyze Incident</span>
-          <span class="submit-arrow">→</span>
+          <span class="submit-arrow">&rarr;</span>
         </button>
 
         <!-- Loading State -->
@@ -123,13 +137,14 @@
 
       <!-- Disclaimer -->
       <div class="disclaimer-box">
-        <span class="disclaimer-icon">!</span>
+        <span class="disclaimer-icon">Notice</span>
         <p>In life-threatening emergencies, <strong>call 911 immediately</strong>. This system provides guidance but does not replace official emergency services.</p>
       </div>
 
     </div>
   </main>
 
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
   <script src="{{ url_for('static', filename='js/report.js') }}"></script>
 </body>
 </html>

@@ -3,43 +3,17 @@
  * Reads analysis data from sessionStorage and renders it dynamically
  */
 
+if (window.AegisTheme && typeof window.AegisTheme.init === 'function') {
+  window.AegisTheme.init();
+}
+
 // Incident type icons and colors
 const INCIDENT_CONFIG = {
-  "Fire":     { icon: "🔥", color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
-  "Accident": { icon: "🚗", color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
-  "Medical":  { icon: "🏥", color: "#06b6d4", bg: "rgba(6,182,212,0.1)" },
-  "Crime":    { icon: "🚔", color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
-  "Flood":    { icon: "🌊", color: "#3b82f6", bg: "rgba(59,130,246,0.1)" },
-};
-
-const SERVICE_ICONS = {
-  "Fire Station": "FS",
-  "Hospital": "H",
-  "Police Station": "PS",
-  "Ambulance": "AMB",
-  "Evacuation Center": "EC",
-  "NDRRMC": "N",
-  "Red Cross": "RC",
-  "Clinic": "CL",
-  "Barangay Emergency Response": "BER",
-  "Traffic Management": "TM",
-  "School Clinic": "SC",
-  "School Security": "SS",
-  "DepEd Emergency": "DE",
-  "Highway Patrol": "HP",
-  "MMDA / DPWH": "DP",
-  "Towing Service": "TS",
-  "Barangay Hall": "BH",
-  "Homeowners Association": "HOA",
-  "Barangay Tanod": "BT",
-  "City Police Precinct": "CPP",
-  "Mall Security": "MS",
-  "City Health Office": "CHO",
-  "Coast Guard (if coastal)": "CG",
-  "Barangay Health Center": "BHC",
-  "Clinic / Hospital": "CH",
-  "CCTV Monitoring": "CCTV",
-  "PAGASA": "P",
+  "Fire":     { color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
+  "Accident": { color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+  "Medical":  { color: "#06b6d4", bg: "rgba(6,182,212,0.1)" },
+  "Crime":    { color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
+  "Flood":    { color: "#3b82f6", bg: "rgba(59,130,246,0.1)" },
 };
 
 // Load and render data
@@ -60,22 +34,19 @@ function renderResult(data) {
   const config = INCIDENT_CONFIG[data.incident_type] || INCIDENT_CONFIG["Medical"];
 
   // --- Type Banner ---
-  document.getElementById('typeIcon').textContent = config.icon;
   document.getElementById('typeName').textContent = data.incident_type;
 
-  // Style the type icon background
-  const typeIconEl = document.getElementById('typeIcon');
-  typeIconEl.style.background = config.bg;
-  typeIconEl.style.border = `1px solid ${config.color}33`;
+  const typeBanner = document.getElementById('typeBanner');
+  typeBanner.style.borderColor = `${config.color}33`;
+  typeBanner.style.boxShadow = `0 0 0 1px ${config.color}14, 0 18px 40px rgba(0,0,0,0.08)`;
 
   // --- Confidence ---
-  document.getElementById('confidenceValue').textContent = data.confidence + '%';
+  document.getElementById('confidenceValue').textContent = formatPercent(data.confidence);
 
   // --- Risk Badge ---
   const riskBadge = document.getElementById('riskBadge');
   const riskClass = data.risk_level.toLowerCase();
   riskBadge.classList.add('risk-' + riskClass);
-  document.getElementById('riskIcon').textContent = data.risk_icon;
   document.getElementById('riskValue').textContent = data.risk_level.toUpperCase();
 
   // --- Metadata ---
@@ -103,14 +74,13 @@ function renderResult(data) {
   uniqueServices.forEach(service => {
     const chip = document.createElement('div');
     chip.className = 'service-chip';
-    const icon = SERVICE_ICONS[service] || 'S';
-    chip.innerHTML = `<span>${icon}</span> ${service}`;
+    chip.textContent = service;
     servicesList.appendChild(chip);
   });
 
   // --- Location Note ---
   const locationNote = document.getElementById('locationNote');
-  locationNote.innerHTML = `<span style="color:var(--accent-blue)">Location ${data.location}:</span> ${data.location_note}`;
+  locationNote.innerHTML = `<strong>Location note:</strong> ${data.location_note}`;
 
   // --- Contacts ---
   const contactsList = document.getElementById('contactsList');
@@ -126,9 +96,8 @@ function renderResult(data) {
     btn.innerHTML = `
       <div class="contact-info">
         <span class="contact-name">${contact.name}</span>
-        <span class="contact-number">${contact.number}</span>
+        <span class="contact-number">${formatPhone(contact.number)}</span>
       </div>
-      <span class="contact-call-icon">CALL</span>
     `;
     contactsList.appendChild(btn);
   });
@@ -145,17 +114,31 @@ function renderResult(data) {
     const div = document.createElement('div');
     div.className = 'ml-bar-item';
     div.innerHTML = `
-      <div class="ml-bar-label">${cfg.icon} ${item.type}</div>
+      <div class="ml-bar-label">${item.type}</div>
       <div class="ml-bar-track">
         <div class="ml-bar-fill ${isWinner ? 'winner' : ''}"
              style="width:0%; background:${isWinner ? '' : cfg.color}"
              data-target="${pct}">
         </div>
       </div>
-      <div class="ml-bar-pct">${item.confidence.toFixed(1)}%</div>
+      <div class="ml-bar-pct">${formatPercent(item.confidence)}</div>
     `;
     mlBars.appendChild(div);
   });
+
+  const exportBtn = document.getElementById('exportPdfBtn');
+  if (exportBtn) {
+    const reportId = sessionStorage.getItem('aegisReportId');
+    if (reportId) {
+      exportBtn.href = `/export/${reportId}`;
+      exportBtn.setAttribute('download', `aegis-report-${reportId}.pdf`);
+    } else {
+      exportBtn.classList.add('is-disabled');
+      exportBtn.setAttribute('aria-disabled', 'true');
+      exportBtn.removeAttribute('href');
+      exportBtn.removeAttribute('download');
+    }
+  }
 
   // Animate bars after a short delay
   setTimeout(() => {
@@ -191,4 +174,20 @@ function shareReport() {
       alert('Report copied to clipboard!');
     });
   }
+}
+
+function formatPercent(value) {
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue)) {
+    return '0.0%';
+  }
+  return `${numericValue.toFixed(1)}%`;
+}
+
+function formatPhone(value) {
+  return String(value)
+    .replace(/\s+/g, ' ')
+    .replace(/\(\s*/g, '(')
+    .replace(/\s*\)/g, ')')
+    .trim();
 }

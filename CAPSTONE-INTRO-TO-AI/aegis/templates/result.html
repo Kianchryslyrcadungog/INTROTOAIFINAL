@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analysis Result — Aegis</title>
+    <script>
+      (function () {
+        try {
+          var savedTheme = localStorage.getItem('aegis-theme');
+          var theme = savedTheme === 'light' || savedTheme === 'dark'
+            ? savedTheme
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.dataset.theme = theme;
+        } catch (error) {}
+      })();
+    </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
@@ -19,6 +30,12 @@
       <span class="logo-text">AEGIS</span>
     </a>
     <div class="nav-links">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb"></span>
+        </span>
+        <span class="theme-toggle-label" data-theme-label>Dark</span>
+      </button>
       <a href="/report" class="nav-cta">New Report</a>
     </div>
   </nav>
@@ -31,7 +48,6 @@
 
       <!-- Incident Type Banner -->
       <div class="result-type-banner" id="typeBanner">
-        <div class="result-type-icon" id="typeIcon"></div>
         <div class="result-type-info">
           <div class="result-type-label">Detected Incident</div>
           <div class="result-type-name" id="typeName">Fire</div>
@@ -45,7 +61,6 @@
       <!-- Risk Level Badge -->
       <div class="result-risk-section">
         <div class="risk-badge" id="riskBadge">
-          <span class="risk-icon" id="riskIcon">H</span>
           <div class="risk-info">
             <span class="risk-label">Risk Level</span>
             <span class="risk-value" id="riskValue">HIGH</span>
@@ -71,7 +86,6 @@
       <!-- Recommended Actions -->
       <div class="result-card card-actions">
         <div class="card-header">
-          <span class="card-header-icon">A</span>
           <h2 class="card-title">Immediate Actions</h2>
           <span class="card-badge">AI Generated</span>
         </div>
@@ -86,7 +100,6 @@
         <!-- Suggested Services -->
         <div class="result-card card-services">
           <div class="card-header">
-            <span class="card-header-icon">S</span>
             <h2 class="card-title">Suggested Services</h2>
           </div>
           <div class="services-list" id="servicesList">
@@ -101,7 +114,6 @@
         <!-- Emergency Contacts -->
         <div class="result-card card-contacts">
           <div class="card-header">
-            <span class="card-header-icon">C</span>
             <h2 class="card-title">Emergency Contacts</h2>
           </div>
           <div class="contacts-list" id="contactsList">
@@ -116,7 +128,6 @@
     <!-- ML Confidence Breakdown -->
     <div class="result-card card-ml">
       <div class="card-header">
-        <span class="card-header-icon">M</span>
         <h2 class="card-title">ML Classification Breakdown</h2>
         <span class="card-badge card-badge-blue">Naive Bayes</span>
       </div>
@@ -132,17 +143,14 @@
     <!-- Action Buttons -->
     <div class="result-actions">
       <a href="/report" class="btn-primary">
-        <span>R</span>
         Report Another Incident
       </a>
-      <button class="btn-secondary" onclick="window.print()">
-        <span>P</span>
-        Print This Report
+      <button type="button" class="btn-secondary" onclick="window.print()">
+        Print Report
       </button>
-      <button class="btn-secondary" onclick="shareReport()">
-        <span>S</span>
-        Share
-      </button>
+      <a class="btn-secondary" id="exportPdfBtn" href="#">
+        Download PDF Report
+      </a>
     </div>
 
     <!-- Disclaimer -->
@@ -153,6 +161,7 @@
 
   </main>
 
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
   <script src="{{ url_for('static', filename='js/result.js') }}"></script>
 </body>
 </html>
