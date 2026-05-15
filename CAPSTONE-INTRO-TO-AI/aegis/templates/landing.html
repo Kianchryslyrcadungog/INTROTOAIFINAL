@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body class="landing-body">
+  {% from "_brand_logo.html" import aegis_brand %}
 
   <!-- Animated background grid -->
   <div class="bg-grid"></div>
@@ -28,10 +29,7 @@
 
   <!-- Navigation -->
   <nav class="nav">
-    <div class="nav-logo">
-      <span class="logo-shield"></span>
-      <span class="logo-text">AEGIS</span>
-    </div>
+    {{ aegis_brand('/', 'nav-logo') }}
     <div class="nav-links">
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">
         <span class="theme-toggle-track">
@@ -161,9 +159,7 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <div class="footer-logo">
-      <span>AE</span> AEGIS
-    </div>
+    {{ aegis_brand('/', 'footer-logo') }}
     <p class="footer-note">Smart Incident Detection and Response Recommendation System</p>
     <p class="footer-disclaimer">This system is for guidance only. Always contact official emergency services in life-threatening situations.</p>
   </footer>

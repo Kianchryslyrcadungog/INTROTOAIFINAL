@@ -21,15 +21,14 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body class="report-body">
+  {% from "_brand_logo.html" import aegis_brand %}
 
   <div class="bg-grid"></div>
   <div class="bg-glow bg-glow-2"></div>
 
   <!-- Navigation -->
   <nav class="nav">
-    <a href="/" class="nav-logo">
-      <span class="logo-text">AEGIS</span>
-    </a>
+    {{ aegis_brand('/', 'nav-logo') }}
     <div class="nav-links">
       <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle color mode" aria-pressed="false">
         <span class="theme-toggle-track">

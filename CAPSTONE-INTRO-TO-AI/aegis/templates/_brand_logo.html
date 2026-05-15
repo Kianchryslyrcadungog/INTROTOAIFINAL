@@ -1,0 +1,15 @@
+{% macro aegis_brand(href='/', class_name='') -%}
+<a href="{{ href }}" class="brand-logo {{ class_name }}" aria-label="AEGIS home">
+  <img
+    src="{{ url_for('static', filename='images/aegis-logo-dark.svg') }}"
+    alt="AEGIS logo"
+    class="brand-logo-image brand-logo-image-dark"
+  >
+  <img
+    src="{{ url_for('static', filename='images/aegis-logo-light.svg') }}"
+    alt=""
+    aria-hidden="true"
+    class="brand-logo-image brand-logo-image-light"
+  >
+</a>
+{%- endmacro %}
